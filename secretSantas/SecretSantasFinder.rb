@@ -3,19 +3,18 @@ class SecretSantasFinder
 	public 
 	def find players
 	  originalMails = players.values
-    mails = players.values.sort_by {rand} 
-    mails = players.values.sort_by {rand} until compareMails originalMails, mails
+    assignedSantas = {}
     
-    i = 0
-	  players.each_key do |key|
-      players[key] = mails[i]
-      i+=1
+    players.each_key do |key|
+      santa = findPossibleSantan players, key, originalMails
+      assignedSantas[key] = santa
+      originalMails.delete santa
     end 
-	  players
+	  assignedSantas
   end
   
   def hasSameFamilyName name1, name2
-    return name1.split(" ").last.eql? name2.split(" ").last
+    name1.split(" ").last.eql? name2.split(" ").last
   end
   
   private 
@@ -23,7 +22,16 @@ class SecretSantasFinder
     originalMails.each_with_index do |mail, i|
       return false if mail == currentMails[i]
     end
-    return true
-  end  
+    true
+  end 
+  
+  def findPossibleSantan players, key, mails
+    mails.each do |mail|
+      key1 = players.key mail
+      return nil if key1.nil?
+      return mail if !players[key].eql? mail and !hasSameFamilyName key, key1
+    end
+    nil  
+  end 
     
 end
